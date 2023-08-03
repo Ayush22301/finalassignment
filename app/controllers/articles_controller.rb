@@ -39,7 +39,11 @@ class ArticlesController < ApplicationController
               genre: article.genre,
               image_url: article.image.attached? ? url_for(article.image) : nil,
               created_at: article.created_at,
-              updated_at: article.updated_at
+              updated_at: article.updated_at,
+              no_of_likes: article.no_of_likes,
+              no_of_comments: article.no_of_comments,
+              likes: article.likes,
+              comments: article.comments
             }
         end
         render json: response
@@ -73,7 +77,11 @@ class ArticlesController < ApplicationController
             genre: article.genre,
             image_url: article.image.attached? ? url_for(article.image) : nil,
             created_at: article.created_at,
-            updated_at: article.updated_at
+            updated_at: article.updated_at,
+            no_of_likes: article.no_of_likes,
+            no_of_comments: article.no_of_comments,
+            likes: article.likes,
+            comments: article.comments
           }
         end
       
@@ -97,7 +105,11 @@ class ArticlesController < ApplicationController
             genre: article.genre,
             image_url: article.image.attached? ? url_for(article.image) : nil,
             created_at: article.created_at,
-            updated_at: article.updated_at
+            updated_at: article.updated_at,
+            no_of_likes: article.no_of_likes,
+            no_of_comments: article.no_of_comments,
+            likes: article.likes,
+            comments: article.comments
           }
         end
     
@@ -120,7 +132,11 @@ class ArticlesController < ApplicationController
             genre: article.genre,
             image_url: article.image.attached? ? url_for(article.image) : nil,
             created_at: article.created_at,
-            updated_at: article.updated_at
+            updated_at: article.updated_at,
+            no_of_likes: article.no_of_likes,
+            no_of_comments: article.no_of_comments,
+            likes: article.likes,
+            comments: article.comments
           }
         end
     
@@ -139,7 +155,11 @@ class ArticlesController < ApplicationController
             title: permitted_params[:title],
             description: permitted_params[:description],
             genre: permitted_params[:genre],
-            author: author
+            author: author,
+            no_of_likes: 0,
+            no_of_comments: 0,
+            likes: [],
+            comments: []
         )
 
         # Attach the 'image' file to the article if present
@@ -158,7 +178,11 @@ class ArticlesController < ApplicationController
             genre: article.genre,
             image_url: article.image.attached? ? url_for(article.image) : nil,
             created_at: article.created_at,
-            updated_at: article.updated_at
+            updated_at: article.updated_at,
+            no_of_likes: article.no_of_likes,
+            no_of_comments: article.no_of_comments,
+            likes: article.likes,
+            comments: article.comments
             }
 
             render json: response, status: :created
@@ -189,7 +213,11 @@ class ArticlesController < ApplicationController
             genre: article.genre,
             image_url: article.image.attached? ? url_for(article.image) : nil,
             created_at: article.created_at,
-            updated_at: article.updated_at
+            updated_at: article.updated_at,
+            no_of_likes: article.no_of_likes,
+            no_of_comments: article.no_of_comments,
+            likes: article.likes,
+            comments: article.comments
             }
 
             render json: response
