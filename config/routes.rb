@@ -15,4 +15,8 @@ Rails.application.routes.draw do
   get "articles/search", to: "articles#search"
 
   get "articles/sort", to: "articles#sort"
+
+  get "articles/all", to: "articles#all"
+
+  
 end

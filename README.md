@@ -10,4 +10,4 @@ Add new post  -----
     Author
 Edit Post   -------
 Delete post -------
-Search post, author, or topic
+Search post, author, or topic   -----

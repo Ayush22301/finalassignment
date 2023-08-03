@@ -110,32 +110,48 @@ class ArticlesController < ApplicationController
     
 
     def search
-        # Permit only the 'description' field from the request parameters
-        search_term = article_search_params[:description]
+      title = article_search_params[:title].presence
+      description = article_search_params[:description].presence
+      genre = article_search_params[:genre].presence
+      author_name = article_search_params[:author].presence
     
-        # Perform the partial search using 'ILIKE' for case-insensitive search (assuming you're using PostgreSQL)
-        articles = Article.where("lower(description) LIKE ?", "%#{search_term}%")
+      articles = Article.all
     
-        # Build a JSON response with image URLs
-        response = articles.map do |article|
-          {
-            id: article.id,
-            title: article.title,
-            author: article.author,
-            description: article.description,
-            genre: article.genre,
-            image_url: article.image.attached? ? url_for(article.image) : nil,
-            created_at: article.created_at,
-            updated_at: article.updated_at,
-            no_of_likes: article.no_of_likes,
-            no_of_comments: article.no_of_comments,
-            likes: article.likes,
-            comments: article.comments
-          }
-        end
+      articles = articles.where("lower(title) LIKE ?", "%#{title.downcase}%") if title
+      articles = articles.where("lower(description) LIKE ?", "%#{description.downcase}%") if description
+      articles = articles.where("lower(genre) LIKE ?", "%#{genre.downcase}%") if genre
     
-        render json: response
+      if author_name.present?
+        # Find the author by name (case-insensitive search)
+        author = Author.find_by("lower(name) = ?", author_name.downcase)
+    
+        # If the author exists, filter articles by the author's ID
+        articles = articles.where(author_id: author.id) if author
+      end
+    
+      # Build a JSON response with image URLs
+      response = articles.map do |article|
+        {
+          id: article.id,
+          title: article.title,
+          author: article.author.name, # Assuming 'author' is an association in the Article model
+          description: article.description,
+          genre: article.genre,
+          image_url: article.image.attached? ? url_for(article.image) : nil,
+          created_at: article.created_at,
+          updated_at: article.updated_at,
+          no_of_likes: article.no_of_likes,
+          no_of_comments: article.no_of_comments,
+          likes: article.likes,
+          comments: article.comments
+        }
+      end
+    
+      render json: response
     end
+    
+    
+    
 
     def sort
         ordr = params.fetch(:order, :asc)
@@ -270,6 +286,26 @@ class ArticlesController < ApplicationController
         end
     end
 
+    def all
+      articles = Article.includes(image_attachment: :blob)
+      response = articles.map do |article|
+          {
+            id: article.id,
+            title: article.title,
+            author: article.author,
+            description: article.description,
+            genre: article.genre,
+            image_url: article.image.attached? ? url_for(article.image) : nil,
+            created_at: article.created_at,
+            updated_at: article.updated_at,
+            no_of_likes: article.no_of_likes,
+            no_of_comments: article.no_of_comments,
+            likes: article.likes,
+            comments: article.comments
+          }
+      end
+      render json: response
+    end
 
     private
 
@@ -280,6 +316,6 @@ class ArticlesController < ApplicationController
 
     def article_search_params
         # Permit only the 'description' field from the request parameters
-        params.permit(:description)
+        params.permit(:title, :author, :description, :genre)
     end
 end
