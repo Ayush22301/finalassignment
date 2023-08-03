@@ -1,6 +1,6 @@
 Level 1
 Show all posts  ----- 
-Filter by - author, date, number of likes, number of comments
+Filter by - author, date, number of likes, number of comments   -------
 Add new post  -----
     Title
     Topic

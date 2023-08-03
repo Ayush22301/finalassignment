@@ -50,43 +50,64 @@ class ArticlesController < ApplicationController
     end
 
     def filter
-        author_name = params.fetch(:author, "")
-        title = params.fetch(:title, "")
-      
-        articles = Article.all
-      
-        if author_name.present?
-          # Find the author by name (case-insensitive search)
-          author = Author.find_by("lower(name) = ?", author_name.downcase)
-      
-          # If the author exists, filter articles by the author's ID
-          articles = articles.where(author: author) if author
-        end
-      
-        if title.present?
-          articles = articles.where(title: title)
-        end
-      
-        # Build a JSON response with image URLs
-        response = articles.map do |article|
-          {
-            id: article.id,
-            title: article.title,
-            author: article.author.name, # Use the author's name instead of the entire author object
-            description: article.description,
-            genre: article.genre,
-            image_url: article.image.attached? ? url_for(article.image) : nil,
-            created_at: article.created_at,
-            updated_at: article.updated_at,
-            no_of_likes: article.no_of_likes,
-            no_of_comments: article.no_of_comments,
-            likes: article.likes,
-            comments: article.comments
-          }
-        end
-      
-        render json: response
+      author_name = params.fetch(:author, "")
+      title = params.fetch(:title, "")
+      min_likes = params.fetch(:min_likes, nil) # The minimum number of likes
+      max_likes = params.fetch(:max_likes, nil) # The maximum number of likes
+      min_comments = params.fetch(:min_comments, nil) # The minimum number of comments
+      max_comments = params.fetch(:max_comments, nil) # The maximum number of comments
+    
+      articles = Article.all
+    
+      if author_name.present?
+        # Find the author by name (case-insensitive search)
+        author = Author.find_by("lower(name) = ?", author_name.downcase)
+    
+        # If the author exists, filter articles by the author's ID
+        articles = articles.where(author: author) if author
+      end
+    
+      if title.present?
+        articles = articles.where(title: title)
+      end
+    
+      if min_likes.present? && max_likes.present?
+        articles = articles.where(no_of_likes: min_likes..max_likes)
+      elsif min_likes.present?
+        articles = articles.where("no_of_likes >= ?", min_likes)
+      elsif max_likes.present?
+        articles = articles.where("no_of_likes <= ?", max_likes)
+      end
+    
+      if min_comments.present? && max_comments.present?
+        articles = articles.where("no_of_comments >= ? AND no_of_comments <= ?", min_comments, max_comments)
+      elsif min_comments.present?
+        articles = articles.where("no_of_comments >= ?", min_comments)
+      elsif max_comments.present?
+        articles = articles.where("no_of_comments <= ?", max_comments)
+      end
+    
+      # Build a JSON response with image URLs
+      response = articles.map do |article|
+        {
+          id: article.id,
+          title: article.title,
+          author: article.author.name, # Use the author's name instead of the entire author object
+          description: article.description,
+          genre: article.genre,
+          image_url: article.image.attached? ? url_for(article.image) : nil,
+          created_at: article.created_at,
+          updated_at: article.updated_at,
+          no_of_likes: article.no_of_likes,
+          no_of_comments: article.no_of_comments,
+          likes: article.likes,
+          comments: article.comments
+        }
+      end
+    
+      render json: response
     end
+    
 
     def search
         # Permit only the 'description' field from the request parameters
